@@ -1,0 +1,5 @@
+origin_date,scenario_id,target,horizon,location,age_group,output_type,output_type_id,value,run_grouping,stochastic_run
+2026-09-05,A-practice,weekly practice incidence,1,US,all,sample,1,11,1,1
+2026-09-05,A-practice,weekly practice incidence,2,US,all,sample,1,13,1,1
+2026-09-05,A-practice,weekly practice incidence,1,US,all,sample,2,9,1,2
+2026-09-05,A-practice,weekly practice incidence,2,US,all,sample,2,15,1,2

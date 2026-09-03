@@ -1,0 +1,21 @@
+name: Validate practice submission
+
+on:
+  pull_request:
+    paths:
+      - "model-output/**"
+      - "model-metadata/**"
+      - "scripts/validate_submission.py"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the practice repository
+        uses: actions/checkout@v4
+
+      - name: Validate paths, names, metadata, and tabular structure
+        run: python scripts/validate_submission.py

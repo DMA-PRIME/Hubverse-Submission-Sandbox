@@ -1,0 +1,44 @@
+{
+  "schema_version": "https://raw.githubusercontent.com/hubverse-org/schemas/main/v4.0.1/tasks-schema.json",
+  "rounds": [
+    {
+      "round_id_from_variable": true,
+      "round_id": "reference_date",
+      "model_tasks": [
+        {
+          "task_ids": {
+            "reference_date": {"required": ["2026-09-05"]},
+            "target": {"required": ["wk ahead practice value"]},
+            "horizon": {"required": [1, 2]},
+            "target_end_date": {"required": ["2026-09-12", "2026-09-19"]},
+            "location": {"required": ["US"]}
+          },
+          "output_type": {
+            "quantile": {"output_type_id": {"required": [0.1, 0.5, 0.9]}, "value": {"type": "double"}}
+          }
+        }
+      ],
+      "submissions_due": {"relative_to": "2026-09-05", "start": -168, "end": -24}
+    },
+    {
+      "round_id_from_variable": true,
+      "round_id": "origin_date",
+      "model_tasks": [
+        {
+          "task_ids": {
+            "origin_date": {"required": ["2026-09-05"]},
+            "scenario_id": {"required": ["A-practice"]},
+            "target": {"required": ["weekly practice incidence"]},
+            "horizon": {"required": [1, 2]},
+            "location": {"required": ["US"]},
+            "age_group": {"required": ["all"]}
+          },
+          "output_type": {
+            "sample": {"output_type_id": {"required": [1, 2]}, "value": {"type": "double"}}
+          }
+        }
+      ],
+      "submissions_due": {"relative_to": "2026-09-05", "start": -168, "end": -24}
+    }
+  ]
+}

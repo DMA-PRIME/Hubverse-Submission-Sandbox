@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Practice model metadata",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["team_abbr", "model_abbr", "model_id", "model_name", "model_type"],
+  "properties": {
+    "team_abbr": {"type": "string", "pattern": "^[A-Za-z0-9_]+$"},
+    "model_abbr": {"type": "string", "pattern": "^[A-Za-z0-9_]+$"},
+    "model_id": {"type": "string", "pattern": "^[A-Za-z0-9_]+-[A-Za-z0-9_]+$"},
+    "model_name": {"type": "string", "minLength": 1},
+    "model_type": {"type": "string", "enum": ["forecast", "scenario"]}
+  }
+}

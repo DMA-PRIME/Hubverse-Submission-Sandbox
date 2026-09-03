@@ -1,0 +1,11 @@
+{
+  "schema_version": "https://raw.githubusercontent.com/hubverse-org/schemas/main/v4.0.1/admin-schema.json",
+  "name": "DMAPRIME Hubverse Submission Sandbox",
+  "maintainer": "DMAPRIME at Clemson University",
+  "contact": {
+    "name": "DMAPRIME Hubverse Support Toolkit"
+  },
+  "repository_host": "github",
+  "file_format": ["csv", "parquet"],
+  "timezone": "UTC"
+}
