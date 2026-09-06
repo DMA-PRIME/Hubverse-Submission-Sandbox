@@ -1,21 +1,67 @@
-name: Validate practice submission
+name: Validate synthetic practice submission
 
 on:
   pull_request:
     paths:
       - "model-output/**"
       - "model-metadata/**"
-      - "scripts/validate_submission.py"
 
 permissions:
   contents: read
 
+concurrency:
+  group: practice-validation-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
 jobs:
   validate:
+    name: Check the two synthetic submission files
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
-      - name: Check out the practice repository
+      - name: Check out the proposed change
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Validate paths, names, metadata, and tabular structure
-        run: python scripts/validate_submission.py
+      - name: Allow only submission-file changes
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -d '' changed_paths < <(
+            git diff --name-only -z \
+              "${{ github.event.pull_request.base.sha }}" \
+              "${{ github.event.pull_request.head.sha }}"
+          )
+
+          if (( ${#changed_paths[@]} == 0 )); then
+            echo "ERROR No changed files were found."
+            exit 1
+          fi
+
+          invalid=0
+          submission_paths=()
+          for path in "${changed_paths[@]}"; do
+            case "$path" in
+              model-output/*|model-metadata/*)
+                submission_paths+=("$path")
+                ;;
+              *)
+                echo "ERROR Only model-output/ and model-metadata/ files may change: $path"
+                invalid=1
+                ;;
+            esac
+          done
+
+          if (( invalid )); then
+            exit 1
+          fi
+
+          printf '%s\0' "${submission_paths[@]}" > "$RUNNER_TEMP/submission-paths"
+
+      - name: Validate the proposed metadata and output
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -d '' submission_paths < "$RUNNER_TEMP/submission-paths"
+          python scripts/validate_submission.py "${submission_paths[@]}"
