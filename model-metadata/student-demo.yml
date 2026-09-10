@@ -1,6 +1,0 @@
-team_abbr: student
-model_abbr: demo
-model_id: student-demo
-model_name: Student demonstration model
-model_type: forecast
-description: Synthetic example used only to practice a Hubverse-shaped submission.
