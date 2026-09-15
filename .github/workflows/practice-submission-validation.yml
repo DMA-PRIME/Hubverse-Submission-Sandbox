@@ -1,0 +1,92 @@
+name: Validate synthetic practice submission
+
+"on":
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - "model-output/**"
+      - "model-metadata/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: practice-validation-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  validate-pull-request:
+    if: ${{ github.event_name == 'pull_request' }}
+    name: Check the two synthetic submission files
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out the proposed change
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Allow only submission-file changes
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -d '' changed_paths < <(
+            git diff --name-only -z \
+              "${{ github.event.pull_request.base.sha }}" \
+              "${{ github.event.pull_request.head.sha }}"
+          )
+
+          if (( ${#changed_paths[@]} == 0 )); then
+            echo "ERROR No changed files were found."
+            exit 1
+          fi
+
+          invalid=0
+          submission_paths=()
+          for path in "${changed_paths[@]}"; do
+            printf 'CHANGED %s\n' "$path"
+            case "$path" in
+              model-output/*|model-metadata/*)
+                submission_paths+=("$path")
+                ;;
+              *)
+                echo "ERROR Only model-output/ and model-metadata/ files may change: $path"
+                invalid=1
+                ;;
+            esac
+          done
+
+          if (( invalid )); then
+            exit 1
+          fi
+
+          printf '%s\0' "${submission_paths[@]}" > "$RUNNER_TEMP/submission-paths"
+
+      - name: Verify the teaching validator
+        run: python scripts/test_validate_submission.py
+
+      - name: Validate the proposed metadata and output
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -d '' submission_paths < "$RUNNER_TEMP/submission-paths"
+          python scripts/validate_submission.py "${submission_paths[@]}"
+
+  smoke-test-validator:
+    if: ${{ github.event_name == 'workflow_dispatch' }}
+    name: Smoke-test the teaching validator
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out main
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Validate the reserved repository example
+        run: python scripts/validate_submission.py
+
+      - name: Verify passing and failing date behavior
+        run: python scripts/test_validate_submission.py
