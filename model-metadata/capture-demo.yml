@@ -1,0 +1,6 @@
+team_abbr: capture
+model_abbr: demo
+model_id: capture-demo
+model_name: Screenshot capture demonstration model
+model_type: forecast
+description: Synthetic teaching file for the DMA-PRIME Hubverse submission screenshot walkthrough.
